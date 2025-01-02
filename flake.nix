@@ -107,7 +107,7 @@
       ) {}
       configuration.hosts;
 
-    */ # TODO was just experimenting
+    /* # TODO was just experimenting
     packages = forAllSystems (system:
       let pkgs = nixpkgs.legacyPackages.${system};
       in {
