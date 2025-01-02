@@ -39,7 +39,7 @@
 
   nixpkgs.config.allowUnfree = true;
 
-  */ #TODO experimenting
+  /* #TODO experimenting
   # Runs on every system rebuild
   systemd.services.createTmpfiles = {
     description = "Creates tmpfiles files after every NixOS rebuild";
