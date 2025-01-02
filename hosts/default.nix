@@ -37,6 +37,8 @@
     settings.experimental-features = ["flakes" "nix-command"]; # Enable flakes and nix commands
   };
 
+  nixpkgs.config.allowUnfree = true;
+
   */ #TODO experimenting
   # Runs on every system rebuild
   systemd.services.createTmpfiles = {
