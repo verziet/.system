@@ -3,9 +3,7 @@
   pkgs-stable,
   pkgs-master,
   inputs,
-
   lib,
-
   host,
   hostname,
   configuration,
@@ -14,32 +12,57 @@
   imports = [
     ./${hostname}/configuration.nix
     ./${hostname}/hardware.nix
+
+    # TODO temporary
+    ../modules/nixos/bootloader/grub.nix
+    ../modules/nixos/hardware/bluetooth.nix
+    ../modules/nixos/nix/nixpkgs.nix
   ];
 
-  # Bootloader/grub configuration
-  boot.loader = {
-    timeout = null;
-    efi.canTouchEfiVariables = true;
+  # Enable grub
+  grub.enable = true;
 
-    grub = {
-      enable = true;
-      useOSProber = true;
-      efiSupport = true;
-      devices = ["nodev"];
+  services.xserver = {
+  xkb.layout = "us,cs";
+  xkb.options = "grp:win_space_toggle";
+};
 
-      backgroundColor = "#000000";
-      splashImage = null;
+  nix = {
+      channel.enable = false;
+
+      settings = {
+	experimental-features = ["flakes" "nix-command"];
+
+	substituters = ["https://hyprland.cachix.org"];
+    	trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+      };
     };
-  };
-
+  /*
   nix = {
     channel.enable = false; # Channels are pointless with flakes enabled
     settings.experimental-features = ["flakes" "nix-command"]; # Enable flakes and nix commands
   };
+*/
 
+  /*
   nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.cudaSupport = true;
+  */
+  nixpkgs.enable = true;
 
-  */ #TODO experimenting
+  environment.systemPackages = with pkgs; [
+    # Basic text editors
+    nano
+    vim
+    emacs-nox
+
+    # Essentials
+    home-manager
+    git
+  ];
+
+  /*
+     #TODO experimenting
   # Runs on every system rebuild
   systemd.services.createTmpfiles = {
     description = "Creates tmpfiles files after every NixOS rebuild";
@@ -76,7 +99,7 @@
 
   # Enable Zsh. required for default user shell below
   programs.zsh.enable = true;
-    
+
   # Setting up users
   users.defaultUserShell = pkgs.zsh;
   users.users = lib.genAttrs host.users (user: {
@@ -107,14 +130,18 @@
     pulse.enable = true;
   };
 
+  bluetooth.enable = true;
+  /*
   # Enable bluetooth
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-  };
+  }; 
 
   # Enable Blueman
   services.blueman.enable = true; # Please let me connect to a bluetooth device :)
+  */
+
 
   # Creating groups
   users.groups.uinput = {};
@@ -135,39 +162,70 @@
         ];
 
         extraDefCfg = "process-unmapped-keys yes";
+/*
+(defalias
+  Ae (unicode Ä)
+  Ue (unicode Ü)
+  Oe (unicode Ö)
+  ae (unicode ä)
+  ue (unicode ü)
+  oe (unicode ö)
+  _ae (fork @ae @Ae (lsft rsft))
+  _ue (fork @ue @Ue (lsft rsft))
+  _oe (fork @oe @Oe (lsft rsft))
+)
+*/
         config = ''
-          (defsrc
-            caps a s d f h j k l ;
+                 (defsrc
+                   caps a s d f h j k l ; u i n m spc
+		   2 3 4 5 6 7 8 9 0
+                 )
+
+          (defvar
+            tap-time 200
+            hold-time 200
           )
 
-	  (defvar
-	    tap-time 200
-	    hold-time 200
-	  )
-
-	  (defalias
-	    caps (tap-hold 100 100 esc (layer-toggle caps))
-	    a (tap-hold $tap-time $hold-time a lmet)
+          (defalias
+            caps (tap-hold 100 100 esc (layer-toggle caps))
+            space (tap-hold 200 200 spc (layer-toggle space))
+            a (tap-hold $tap-time $hold-time a lmet)
             s (tap-hold $tap-time $hold-time s lalt)
-	    d (tap-hold $tap-time $hold-time d lsft)
-	    f (tap-hold $tap-time $hold-time f lctl)
+            d (tap-hold $tap-time $hold-time d lsft)
+            f (tap-hold $tap-time $hold-time f lctl)
             j (tap-hold $tap-time $hold-time j rctl)
-	    k (tap-hold $tap-time $hold-time k rsft)
-	    l (tap-hold $tap-time $hold-time l ralt)
-	    ; (tap-hold $tap-time $hold-time ; rmet)
-	  )
-
-	  (deflayer base
-	    @caps @a @s @d @f h @j @k @l @;
-	  )
-
-          (deflayer caps
-	    _ _ _ _ _ left down up right ;
+            k (tap-hold $tap-time $hold-time k rsft)
+            l (tap-hold $tap-time $hold-time l ralt)
+            ; (tap-hold $tap-time $hold-time ; rmet)
+  	    ě (fork (unicode ě) (unicode Ě) (lsft rsft))
+  	    š (fork (unicode š) (unicode Š) (lsft rsft))
+  	    č (fork (unicode č) (unicode Č) (lsft rsft))
+  	    ř (fork (unicode ř) (unicode Ř) (lsft rsft))
+  	    ž (fork (unicode ž) (unicode Ž) (lsft rsft))
+  	    ý (fork (unicode ý) (unicode Ý) (lsft rsft))
+  	    á (fork (unicode á) (unicode Á) (lsft rsft))
+  	    í (fork (unicode í) (unicode Í) (lsft rsft))
+  	    é (fork (unicode é) (unicode É) (lsft rsft))
           )
+
+          (deflayer base
+            @caps @a @s @d @f h @j @k @l @; _ _ _ _ @space
+ 	    _ _ _ _ _ _ _ _ _
+          )
+
+                 (deflayer caps
+            _ _ _ _ _ left down up right _ home end bspc del enter
+ 	    _ _ _ _ _ _ _ _ _
+                 )
+
+                 (deflayer space
+            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+	    @ě @š @č @ř @ž @ý @á @í @é
+                 )
         '';
       };
     };
   };
 
-  system.stateVersion = host.stateVersion;
+system.stateVersion = host.stateVersion;
 }
