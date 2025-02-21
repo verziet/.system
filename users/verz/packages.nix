@@ -3,9 +3,7 @@
   pkgs-stable,
   pkgs-master,
   inputs,
-
   lib,
-
   host,
   hostname,
   username,
@@ -16,23 +14,31 @@
     inputs.hyprpanel.overlay
   ];
 
-  home.packages = with pkgs; [
-    firefox
-    legcord
-    stremio
-    proton-pass
-    mission-center
-    libreoffice
-    godot_4-mono
-    ranger
-    neovim
-    wofi
-    pavucontrol
-    gnome-control-center
+  home.packages = with pkgs;
+    [
+      firefox
+      stremio
+      mission-center
+      libreoffice
+      bottles
+      lutris
+      heroic
+      google-chrome
+      wineWowPackages.waylandFull
+      protonvpn-gui
+      ranger
+      neovim
+      wofi
+      pavucontrol
+      gnome-control-center
 
-    hyprpanel
-    swww
-  ] ++ [
-    inputs.zen-browser.packages."${host.system}".default
-  ];
-}  
+      hyprpanel
+      swww
+    ] ++ [
+      pkgs-stable.protonmail-desktop
+      pkgs-stable.proton-pass
+    ]
+    ++ [
+      inputs.zen-browser.packages."${host.system}".default
+    ];
+}

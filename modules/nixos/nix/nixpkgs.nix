@@ -3,10 +3,8 @@
   pkgs-stable,
   pkgs-master,
   inputs,
-
   lib,
   config,
-
   host,
   hostname,
   configuration,

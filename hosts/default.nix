@@ -22,27 +22,46 @@
   # Enable grub
   grub.enable = true;
 
+  programs.xwayland.enable = true;
+
   services.xserver = {
-  xkb.layout = "us,cs";
-  xkb.options = "grp:win_space_toggle";
-};
+    enable = true;
+    exportConfiguration = true;
+
+    displayManager.startx.enable = true;
+
+    xkb = {
+      layout = "us,cz";
+      variant = ",qwerty";
+      options = "grp:win_space_toggle";
+    };
+  };
+
+  console = {
+    enable = true;
+    useXkbConfig = true;
+  };
 
   nix = {
-      channel.enable = false;
+    channel.enable = false;
 
-      settings = {
-	experimental-features = ["flakes" "nix-command"];
+    settings = {
+      experimental-features = ["flakes" "nix-command"];
 
-	substituters = ["https://hyprland.cachix.org"];
-    	trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
-      };
+      substituters = ["https://hyprland.cachix.org"];
+      trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
+  };
   /*
   nix = {
     channel.enable = false; # Channels are pointless with flakes enabled
     settings.experimental-features = ["flakes" "nix-command"]; # Enable flakes and nix commands
   };
-*/
+  */
+
+  environment.sessionVariables = {
+    FLAKE = "${inputs.self.outPath}";
+  };
 
   /*
   nixpkgs.config.allowUnfree = true;
@@ -59,6 +78,11 @@
     # Essentials
     home-manager
     git
+
+    # Nix utilities
+    nh # cooler nix-rebuild
+    nix-output-monitor # nom, cool dependency graphs
+    nvd # version diff tool
   ];
 
   /*
@@ -136,12 +160,11 @@
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
-  }; 
+  };
 
   # Enable Blueman
   services.blueman.enable = true; # Please let me connect to a bluetooth device :)
   */
-
 
   # Creating groups
   users.groups.uinput = {};
@@ -162,70 +185,81 @@
         ];
 
         extraDefCfg = "process-unmapped-keys yes";
-/*
-(defalias
-  Ae (unicode Ä)
-  Ue (unicode Ü)
-  Oe (unicode Ö)
-  ae (unicode ä)
-  ue (unicode ü)
-  oe (unicode ö)
-  _ae (fork @ae @Ae (lsft rsft))
-  _ue (fork @ue @Ue (lsft rsft))
-  _oe (fork @oe @Oe (lsft rsft))
-)
-*/
+        /*
+        (defalias
+          Ae (unicode Ä)
+          Ue (unicode Ü)
+          Oe (unicode Ö)
+          ae (unicode ä)
+          ue (unicode ü)
+          oe (unicode ö)
+          _ae (fork @ae @Ae (lsft rsft))
+          _ue (fork @ue @Ue (lsft rsft))
+          _oe (fork @oe @Oe (lsft rsft))
+        )
+        */
         config = ''
-                 (defsrc
-                   caps a s d f h j k l ; u i n m spc
-		   2 3 4 5 6 7 8 9 0
+               (defsrc
+                 1 2 3 4 5 6 7 8 9 0 -
+                 u i
+                 caps a s d f h j k l ;
+                 n m
+                 spc
+               )
+
+               (deftemplate charmod (char mod)
+                 (switch
+                   ((key-timing 3 less-than 250)) $char break
+                   () (tap-hold-release-timeout 200 500 $char $mod $char) break
                  )
+               )
 
-          (defvar
-            tap-time 200
-            hold-time 200
-          )
+               (deflayermap (base)
+                 caps esc
+		 
+                 ;; home row mods
+                 a (t! charmod a lmet)
+                 s (t! charmod s lalt)
+                 d (t! charmod d lsft)
+                 f (t! charmod f rctl)
 
-          (defalias
-            caps (tap-hold 100 100 esc (layer-toggle caps))
-            space (tap-hold 200 200 spc (layer-toggle space))
-            a (tap-hold $tap-time $hold-time a lmet)
-            s (tap-hold $tap-time $hold-time s lalt)
-            d (tap-hold $tap-time $hold-time d lsft)
-            f (tap-hold $tap-time $hold-time f lctl)
-            j (tap-hold $tap-time $hold-time j rctl)
-            k (tap-hold $tap-time $hold-time k rsft)
-            l (tap-hold $tap-time $hold-time l ralt)
-            ; (tap-hold $tap-time $hold-time ; rmet)
-  	    ě (fork (unicode ě) (unicode Ě) (lsft rsft))
-  	    š (fork (unicode š) (unicode Š) (lsft rsft))
-  	    č (fork (unicode č) (unicode Č) (lsft rsft))
-  	    ř (fork (unicode ř) (unicode Ř) (lsft rsft))
-  	    ž (fork (unicode ž) (unicode Ž) (lsft rsft))
-  	    ý (fork (unicode ý) (unicode Ý) (lsft rsft))
-  	    á (fork (unicode á) (unicode Á) (lsft rsft))
-  	    í (fork (unicode í) (unicode Í) (lsft rsft))
-  	    é (fork (unicode é) (unicode É) (lsft rsft))
-          )
+                 j (t! charmod j rctl)
+                 k (t! charmod k rsft)
+                 l (t! charmod l ralt)
+                 ; (t! charmod ; rmet)
 
-          (deflayer base
-            @caps @a @s @d @f h @j @k @l @; _ _ _ _ @space
- 	    _ _ _ _ _ _ _ _ _
-          )
+                 spc (t! charmod spc (layer-toggle space-held))
+               )
 
-                 (deflayer caps
-            _ _ _ _ _ left down up right _ home end bspc del enter
- 	    _ _ _ _ _ _ _ _ _
-                 )
+               (deflayermap (space-held)
+	         ;; czech symbols
+		 1 (macro A-spc ; A-spc)
+		 2 (macro A-spc Digit2 A-spc)
+		 3 (macro A-spc Digit3 A-spc)
+		 4 (macro A-spc Digit4 A-spc)
+		 5 (macro A-spc Digit5 A-spc)
+		 6 (macro A-spc Digit6 A-spc)
+		 7 (macro A-spc Digit8 A-spc)
+		 8 (macro A-spc Digit8 A-spc)
+		 9 (macro A-spc Digit9 A-spc)
+		 0 (macro A-spc Digit0 A-spc)
+		 - (macro A-spc [ A-spc)
 
-                 (deflayer space
-            _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
-	    @ě @š @č @ř @ž @ý @á @í @é
-                 )
+                 u home
+		 i end
+
+                 h left
+		 j down
+		 k up
+		 l right
+
+                 n bspc
+		 m del
+               )
         '';
       };
     };
   };
 
-system.stateVersion = host.stateVersion;
+  system.stateVersion = host.stateVersion;
 }

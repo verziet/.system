@@ -3,10 +3,8 @@
   pkgs-stable,
   pkgs-master,
   inputs,
-
   lib,
   config,
-
   host,
   hostname,
   configuration,
@@ -24,10 +22,10 @@
       channel.enable = false;
 
       settings = {
-	experimental-features = ["flakes" "nix-command"];
+        experimental-features = ["flakes" "nix-command"];
 
-	substituters = ["https://hyprland.cachix.org"];
-    	trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+        substituters = ["https://hyprland.cachix.org"];
+        trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
       };
     };
   };

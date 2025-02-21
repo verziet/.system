@@ -1,7 +1,6 @@
 {
   pkgs,
   inputs,
-
   lib,
   config,
   ...
@@ -21,15 +20,15 @@
     enableTheming = lib.mkEnableOption {
       default = false;
       description = "Enable the GRUB bootloader theming";
-    };  
+    };
   };
 
   config = lib.mkIf config."grub".enable {
-/*
+    /*
     imports = lib.mkIf config."grub".enableTheming [
       inputs.grub2-themes.nixosModules.default
     ];
-*/
+    */
     boot.loader = {
       timeout = config."grub".timeout;
       efi.canTouchEfiVariables = true;
@@ -55,7 +54,7 @@
 
         extraInstallCommands = ''echo "${extraEntries}" >> /boot/grub/grub.cfg'';
       };
- 
+
       /*
       grub2-theme = lib.mkIf config."grub".enableTheming {
         enable = true;

@@ -32,35 +32,38 @@
     };
   };
 
-    nixpkgs.config.permittedInsecurePackages = [
-      "dotnet-sdk-6.0.428"
-    ];
+  nixpkgs.config.permittedInsecurePackages = [
+    "dotnet-sdk-6.0.428"
+  ];
 
-    programs.ags = {
-      enable = true;
+  programs.ags = {
+    enable = true;
 
-      # null or path, leave as null if you don't want hm to manage the config
-      configDir = null;
-   };
+    # null or path, leave as null if you don't want hm to manage the config
+    configDir = null;
+  };
 
-   programs.vscode.enable = true;
+  programs.vscode.enable = true;
 
-    programs.nixcord = {
-    enable = true;  # enable Nixcord. Also installs discord package
-    quickCss = "";  # quickCSS file
+  programs.nixcord = {
+    enable = true; # enable Nixcord. Also installs discord package
+    quickCss = ""; # quickCSS file
     config = {
-      useQuickCss = false;   # use out quickCSS
-      themeLinks = [        # or use an online theme
+      useQuickCss = false; # use out quickCSS
+      themeLinks = [
+        # or use an online theme
       ];
       frameless = true; # set some Vencord options
       plugins = {
-        hideAttachments.enable = true;    # Enable a Vencord plugin
-        /*ignoreActivities = {    # Enable a plugin and set some options
+        hideAttachments.enable = true; # Enable a Vencord plugin
+        /*
+          ignoreActivities = {    # Enable a plugin and set some options
           enable = true;
           ignorePlaying = true;
           ignoreWatching = true;
           ignoredActivities = [ "someActivity" ];
-        };*/
+        };
+        */
       };
     };
     extraConfig = {
@@ -76,7 +79,7 @@
       type = "Application";
       exec = "env XDG_CURRENT_DESKTOP=GNOME ${pkgs.gnome-control-center}/bin/gnome-control-center";
       terminal = false;
-      categories = [ "Application" ];
+      categories = ["Application"];
     };
   };
 
@@ -87,20 +90,20 @@
       spicePkgs = inputs.spicetify-nix.legacyPackages.${host.system};
     in {
       enable = true;
-      enabledCustomApps= [
-	({
-	# The source of the customApp
-	# make sure you're using the correct branch
-	# It could also be a sub-directory of the repo
-	src = pkgs.fetchFromGitHub {
-	  owner = "spicetify";
-	  repo = "cli";
-	  rev = "main";
-	  hash = "sha256-2fsHFl5t/Xo7W5IHGc5FWY92JvXjkln6keEn4BZerw4=";
-	};
-	# The actual file name of the customApp usually ends with .js
-	name = "lyrics-plus";
-      })
+      enabledCustomApps = [
+        {
+          # The source of the customApp
+          # make sure you're using the correct branch
+          # It could also be a sub-directory of the repo
+          src = pkgs.fetchFromGitHub {
+            owner = "spicetify";
+            repo = "cli";
+            rev = "main";
+            hash = "sha256-2fsHFl5t/Xo7W5IHGc5FWY92JvXjkln6keEn4BZerw4=";
+          };
+          # The actual file name of the customApp usually ends with .js
+          name = "lyrics-plus";
+        }
       ];
 
       enabledExtensions = with spicePkgs.extensions; [
@@ -172,7 +175,9 @@
 
       # INPUT
       input = {
-        kb_layout = "us";
+        kb_layout = "us,cz";
+        kb_variant = "qwerty";
+        kb_options = "grp:alt_shift_toggle";
 
         follow_mouse = 1;
 
