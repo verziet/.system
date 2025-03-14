@@ -190,11 +190,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixcord = {
+      url = "github:kaylorben/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     #grub2-themes.url = "github:vinceliuice/grub2-themes";
     hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
-
-    nixcord.url = "github:kaylorben/nixcord";
   };
 }
