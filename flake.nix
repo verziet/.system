@@ -1,5 +1,7 @@
 {
-  description = ''''; #TODO
+  description = ''
+    My super duper flake.nix file
+  ''; #TODO
 
   # Flake outputs
   outputs = {
@@ -11,10 +13,9 @@
     home-manager,
     ...
   } @ inputs: let
-    #FIXME Change the configuration
+    #FIXME Change the configuration to your liking
     configuration = {
       # List of all hosts with their respective settings
-      #
       hosts = {
         "leet" = {
           system = "x86_64-linux"; # System architecture, one of the supported systems defined below
@@ -23,6 +24,7 @@
           # List of host's users
           users = [
             "verz"
+            # Add more users if desired
           ];
         };
 
@@ -49,15 +51,13 @@
 
     forAllSystems = lib.genAttrs (lib.concatLists (lib.attrValues supportedSystems));
   in {
-    # Creating multiple nixos configurations using the hosts set, to select one during install/rebuild: --flake path#host
+    # Creating multiple nixos configurations using the hosts set, to select one during install/rebuild: --flake path#hostname
     nixosConfigurations = lib.mapAttrs (
       hostname: host:
         lib.nixosSystem {
           system = host.system;
           modules = [
             ./hosts
-            #inputs.grub2-themes.nixosModules.default
-            inputs.stylix.nixosModules.stylix
           ];
 
           # Stuff passed to modules as inputs/arguments
@@ -69,15 +69,17 @@
           };
         }
     ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."linux") configuration.hosts);
-    # ^ nixosConfigurations output for linux hosts
+    # ^ nixosConfigurations output set for linux hosts
 
     # I'm not sure whether this works
-    # Creating multiple darwin (mac) configurations using the hosts set, to select one: --flake path#host
+    # Creating multiple darwin (macos) configurations using the hosts set, to select one: --flake path#hostname
     darwinConfigurations = lib.mapAttrs (
       hostname: host:
         nix-darwin.lib.darwinSystem {
           system = host.system;
-          modules = [./hosts];
+          modules = [
+            ./hosts
+          ];
 
           # Stuff passed to modules as inputs/arguments
           specialArgs = {
@@ -88,77 +90,39 @@
           };
         }
     ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."mac") configuration.hosts);
-    # ^ darwinConfigurations output for mac hosts
+    # ^ darwinConfigurations output set for mac hosts
 
-    # Creating multiple home configurations using the multiple users lists while looping through hosts
+    # Creating multiple home configurations using the users lists while looping through hosts
     homeConfigurations =
-      lib.attrsets.foldlAttrs
-      (
+      lib.attrsets.foldlAttrs (
         _acc: hostname: host:
-          lib.foldl (_acc2: username:
-            _acc2
-            // {
-              "${username}" = home-manager.lib.homeManagerConfiguration {
-                pkgs = nixpkgs.legacyPackages.${host.system};
-                modules = [
-                  ./users
-                  inputs.stylix.homeManagerModules.stylix
-                ];
+          lib.foldl (
+            _acc2: username:
+              _acc2
+              // {
+                "${username}" = home-manager.lib.homeManagerConfiguration {
+                  pkgs = nixpkgs.legacyPackages.${host.system};
+                  modules = [
+                    ./users
+                  ];
 
-                # Stuff passed to modules as inputs/arguments
-                extraSpecialArgs = {
-                  # pkgs passed by default
-                  pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
-                  pkgs-master = nixpkgs-master.legacyPackages.${host.system};
-                  inherit inputs host hostname username configuration;
+                  # Stuff passed to modules as inputs/arguments
+                  extraSpecialArgs = {
+                    # pkgs passed by default
+                    pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
+                    pkgs-master = nixpkgs-master.legacyPackages.${host.system};
+                    inherit inputs host hostname username configuration;
+                  };
                 };
-              };
-            })
+              }
+          )
           _acc
           host.users
       ) {}
       configuration.hosts;
 
-    /*
-        # TODO was just experimenting
-     packages = forAllSystems (system:
-       let pkgs = nixpkgs.legacyPackages.${system};
-       in {
-         default = self.packages.${system}.rebuild;
-
-         rebuild = pkgs.writeShellApplication {
-           name = "rebuild";
-           runtimeInputs = with pkgs; [ git nh ]; # I could make this fancier by adding other deps
-           text = ''${./scripts/rebuild.sh} . ''
-    + toString (lib.length (lib.attrNames configuration.hosts)) # Pass hosts length, in order to parse later
-    + " " + lib.concatStringsSep " " (lib.attrNames configuration.hosts) # And the hosts themselves
-    + " \"$@\"";
-         };
-
-
-         install = pkgs.writeShellApplication {
-           name = "install";
-           runtimeInputs = with pkgs; [ git nh ]; # I could make this fancier by adding other deps
-           text = ''source ${./scripts/install.sh}'';
-         };
-       });
-
-     apps = forAllSystems (system: {
-       default = self.apps.${system}.rebuild;
-
-       rebuild = {
-         type = "app";
-         program = "${self.packages.${system}.rebuild}/bin/rebuild";
-       };
-
-       install = {
-         type = "app";
-         program = "${self.packages.${system}.install}/bin/install";
-       };
-     });
-    */
-
-    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra); # Most popular formatter, use with nix fmt
+    # Most popular formatter, use with nix fmt
+    formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
   };
 
   # Flake inputs
@@ -167,34 +131,56 @@
     nixpkgs-stable.url = "github:nixos/nixpkgs?ref=nixos-24.11"; # stable branch
     nixpkgs-master.url = "github:nixos/nixpkgs?ref=master"; # Master branch (extreme rolling release), won't ever use this (i think)
 
+    # Darwin (macos) configurations flake
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs"; # Would dupe nixpkgs otherwise (more storage eaten)
+    };
+
+    # Home manager configurations flake
+    home-manager = {
+      url = "https://github.com/nix-community/home-manager/archive/master.tar.gz"; # Unstable home-manager branch
+      # url = "https://flakehub.com/f/nix-community/home-manager/*.tar.gz";
+      # ^ latest stable home-manager, use in case of any problems (very unlikely, here as a fallback)
+      # ^ might also cause problems, requires flake.lock update sometimes
+
+      inputs.nixpkgs.follows = "nixpkgs"; # Would dupe nixpkgs otherwise (more storage eaten)
+    };
+
+    # Hyprland from source flake
+    hyprland = {
+      url = "github:hyprwm/Hyprland";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    home-manager = {
-      url = "https://github.com/nix-community/home-manager/archive/master.tar.gz"; # Unstable home-manager, cuz we ain't no grans yo
-      # url = "https://flakehub.com/f/nix-community/home-manager/*.tar.gz";
-      # ^ latest stable home-manager, use in case of any problems (very unlikely, here as a fallback) #TODO might also cause problems
-
-      inputs.nixpkgs.follows = "nixpkgs"; # Would dupe nixpkgs otherwise
+    # Widgets flake
+    ags = {
+      url = "github:Aylur/ags";
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    stylix.url = "github:danth/stylix";
-    ags.url = "github:Aylur/ags";
+    # Firefox theme flake
+    textfox = {
+      url = "github:adriankarlen/textfox";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    hyprland.url = "github:hyprwm/Hyprland";
-
+    # Declarative spotify plugins with spicetify flake
     spicetify-nix = {
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    # Declarative discord plugins with vencord flake
+    nixcord = {
+      url = "github:kaylorben/nixcord";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
 
-    #grub2-themes.url = "github:vinceliuice/grub2-themes";
-    hyprpanel.url = "github:Jas-SinghFSU/HyprPanel";
-
-    nixcord.url = "github:kaylorben/nixcord";
+    # Zen browser flake (package doesn't exist yet) # TODO might just main firefox instead
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 }

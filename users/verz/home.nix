@@ -16,12 +16,8 @@
     inputs.spicetify-nix.homeManagerModules.default
     inputs.nixcord.homeManagerModules.nixcord
     inputs.ags.homeManagerModules.default
+    inputs.textfox.homeManagerModules.default
   ];
-
-  stylix.enable = true;
-  stylix.image = ../../lion.png;
-  stylix.polarity = "dark";
-  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
 
   programs.git = {
     enable = true;
@@ -32,16 +28,26 @@
     };
   };
 
-  nixpkgs.config.permittedInsecurePackages = [
-    "dotnet-sdk-6.0.428"
-  ];
+  /*
 
   programs.ags = {
     enable = true;
+    configDir = null; # if ags dir is managed by home-manager, it'll end up being read-only. not too cool.
+    # configDir = ./.config/ags;
 
-    # null or path, leave as null if you don't want hm to manage the config
-    configDir = null;
+    extraPackages = with pkgs; [
+      gtksourceview
+      gtksourceview4
+      python311Packages.material-color-utilities
+      python311Packages.pywayland
+      pywal
+      sassc
+      webkitgtk
+      webp-pixbuf-loader
+      ydotool
+    ];
   };
+  */
 
   programs.vscode.enable = true;
 
@@ -51,7 +57,7 @@
     config = {
       useQuickCss = false; # use out quickCSS
       themeLinks = [
-        # or use an online theme
+        "https://raw.githubusercontent.com/refact0r/system24/refs/heads/main/theme/system24.theme.css"
       ];
       frameless = true; # set some Vencord options
       plugins = {
@@ -69,6 +75,14 @@
     extraConfig = {
       # Some extra JSON config here
       # ...
+    };
+  };
+
+  textfox = {
+    enable = true;
+    profile = "${username}";
+    config = {
+      # Optional config
     };
   };
 
@@ -111,6 +125,8 @@
         hidePodcasts
         shuffle
       ];
+
+      theme = spicePkgs.themes.text;
     };
   };
 
@@ -128,6 +144,10 @@
         "swww-daemon"
       ];
 
+      exec = [
+        "kanata -c $HOME/kanata.kbd"
+      ];
+
       monitor = [
         # TODO
         "eDP-1, 1920x1080@144, 0x0, 1.2"
@@ -139,8 +159,8 @@
 
         border_size = 1;
 
-        #"col.active_border" = "rgba(d65d0eff) rgba(98971aff) 45deg";
-        #"col.inactive_border" = "rgba(3c3836ff)";
+        "col.active_border" = lib.mkForce "rgba(ffffffff)";
+        "col.inactive_border" = lib.mkForce "rgba(ffffffff)";
 
         resize_on_border = true;
 
@@ -149,7 +169,7 @@
       };
 
       decoration = {
-        rounding = 5;
+        rounding = 0;
 
         active_opacity = 1.0;
         inactive_opacity = 1.0;
@@ -176,8 +196,8 @@
       # INPUT
       input = {
         kb_layout = "us,cz";
-        kb_variant = "qwerty";
-        kb_options = "grp:alt_shift_toggle";
+        kb_variant = ",qwerty";
+        kb_options = "grp:menu_toggle";
 
         follow_mouse = 1;
 
@@ -267,23 +287,31 @@
       bindel = [
         ",XF86AudioRaiseVolume,  exec, wpctl set-volume -l 1 @DEFAULT_AUDIO_SINK@ 5%+"
         ",XF86AudioLowerVolume,  exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
-        ",XF86AudioMute,         exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
-        ",XF86AudioMicMute,      exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        "$mainMod, bracketright, exec, brightnessctl s 10%+"
-        "$mainMod, bracketleft,  exec, brightnessctl s 10%-"
+        ",XF86MonBrightnessUp,   exec, brightnessctl s 5%+"
+        ",XF86MonBrightnessDown, exec, brightnessctl s 5%- -n 1"
       ];
 
-      # Audio playback
       bindl = [
-        ", XF86AudioNext,  exec, playerctl next"
-        ", XF86AudioPause, exec, playerctl play-pause"
-        ", XF86AudioPlay,  exec, playerctl play-pause"
-        ", XF86AudioPrev,  exec, playerctl previous"
+        ",XF86AudioNext,  exec, playerctl next"
+        ",XF86AudioPause, exec, playerctl play-pause"
+        ",XF86AudioPlay,    exec, playerctl play-pause"
+        ",XF86AudioPrev,    exec, playerctl previous"
+        ",XF86AudioMute,         exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        ",XF86AudioMicMute,      exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
       ];
     };
   };
 
   home.file = {
+    ".zshrc" = {
+      text = ''
+        export EDITOR=vim
+               set -o vi
+               bindkey '^H' backward-kill-word
+               bindkey '5~' kill-word
+      '';
+    };
+
     ".zprofile" = {
       text = ''
         if uwsm check may-start; then

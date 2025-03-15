@@ -14,11 +14,6 @@
     ./packages.nix
   ];
 
-  stylix.enable = true;
-  stylix.image = ../../lion.png;
-  stylix.polarity = "dark";
-  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
-
   # nvidia
   services.xserver.videoDrivers = ["nvidia"];
 
@@ -81,19 +76,18 @@
   };
 
   services.upower.enable = true;
-  grub.timeout = 1;
 
   # In your NixOS configuration file
-networking.firewall = {
-  enable = true;
-  allowedTCPPorts = [ 22 ]; # Allow SSH
-};
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [22]; # Allow SSH
+  };
 
   services.openssh = {
-  enable = true;
-  # Optional: Permit root login (not recommended)
-  # settings.PermitRootLogin = "no";
-};
+    enable = true;
+    # Optional: Permit root login (not recommended)
+    # settings.PermitRootLogin = "no";
+  };
 
   # tty1 autologin
   systemd.services."getty@tty1" = {

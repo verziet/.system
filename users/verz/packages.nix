@@ -11,7 +11,6 @@
   ...
 }: {
   nixpkgs.overlays = [
-    inputs.hyprpanel.overlay
   ];
 
   home.packages = with pkgs;
@@ -23,6 +22,7 @@
       bottles
       lutris
       heroic
+      ticktick
       google-chrome
       wineWowPackages.waylandFull
       protonvpn-gui
@@ -32,9 +32,20 @@
       pavucontrol
       gnome-control-center
 
-      hyprpanel
       swww
-    ] ++ [
+
+      /*
+        #ags
+         ollama
+      pywal
+      sassc
+      (python311.withPackages (p: [
+        p.material-color-utilities
+        p.pywayland
+      ]))
+      */
+    ]
+    ++ [
       pkgs-stable.protonmail-desktop
       pkgs-stable.proton-pass
     ]
