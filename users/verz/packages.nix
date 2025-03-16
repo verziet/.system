@@ -33,6 +33,7 @@
       gnome-control-center
 
       swww
+      kanata
 
       /*
         #ags

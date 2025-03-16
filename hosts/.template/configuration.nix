@@ -10,7 +10,5 @@
   configuration,
   ...
 }: {
-  environment.systemPackages = with pkgs; [
-    neofetch
-  ];
+  # All your host specific configuration belongs here
 }

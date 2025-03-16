@@ -11,6 +11,6 @@
   ...
 }: {
   environment.systemPackages = with pkgs; [
-    neofetch
+    # List of all your host specific packages
   ];
 }

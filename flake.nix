@@ -56,9 +56,7 @@
       hostname: host:
         lib.nixosSystem {
           system = host.system;
-          modules = [
-            ./hosts
-          ];
+          modules = [./hosts];
 
           # Stuff passed to modules as inputs/arguments
           specialArgs = {
@@ -77,9 +75,7 @@
       hostname: host:
         nix-darwin.lib.darwinSystem {
           system = host.system;
-          modules = [
-            ./hosts
-          ];
+          modules = [./hosts];
 
           # Stuff passed to modules as inputs/arguments
           specialArgs = {
@@ -100,11 +96,9 @@
             _acc2: username:
               _acc2
               // {
-                "${username}" = home-manager.lib.homeManagerConfiguration {
+                "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
                   pkgs = nixpkgs.legacyPackages.${host.system};
-                  modules = [
-                    ./users
-                  ];
+                  modules = [./users];
 
                   # Stuff passed to modules as inputs/arguments
                   extraSpecialArgs = {

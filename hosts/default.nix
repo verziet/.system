@@ -10,34 +10,7 @@
   configuration,
   ...
 }: {
-  imports = [
-    ./${hostname}/configuration.nix
-    ./${hostname}/packages.nix
-    ./${hostname}/hardware.nix
-
-    # TODO temporary
-    ../modules/nixos/bootloader.nix
-    ../modules/nixos/nix.nix
-
-    ../modules/nixos/hardware/network.nix
-    ../modules/nixos/hardware/bluetooth.nix
-  ];
-
-  services.xserver = {
-    enable = lib.mkDefault true;
-    exportConfiguration = lib.mkDefault true;
-
-    displayManager.startx.enable = lib.mkDefault true;
-
-    xkb = {
-      layout = lib.mkDefault "us";
-    };
-  };
-
-  console = {
-    enable = lib.mkDefault true;
-    useXkbConfig = lib.mkDefault true;
-  };
+  networking.hostName = lib.mkDefault hostname; # Default hostname set to "hostname" defined in flake.nix
 
   environment.systemPackages = with pkgs; [
     # Basic text editors
@@ -50,43 +23,46 @@
     git
 
     # Nix utilities
-    nh # cooler nix-rebuild
+    nh # nix helper
     nix-output-monitor # nom, cool dependency graphs
     nvd # version diff tool
 
-    kanata
-    playerctl
+    # Some control utilities
     brightnessctl
-    wireplumber
+    playerctl
   ];
 
-  # Enable Zsh. required for default user shell below
-  programs.zsh.enable = true;
-
   # Setting up users
-  users.defaultUserShell = pkgs.zsh;
-  users.users = lib.genAttrs host.users (user: {
-    initialPassword = user; # Setting initial password to the username
-    isNormalUser = true;
+  users = {
+    defaultUserShell = lib.mkOverride 999 pkgs.zsh;
+    users = lib.genAttrs host.users (username: {
+      initialPassword = lib.mkDefault username; # Setting initial password to the username
+      isNormalUser = lib.mkDefault true;
 
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-      "audio"
-      "input"
-      "uinput"
-    ];
-  });
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "audio"
+        "input"
+      ];
+    });
+  };
 
-  networking.hostName = lib.mkDefault hostname; # Default hostname set to "hostname" defined in flake.nix
+  # Enable zsh, required for default user shell above
+  programs.zsh.enable = lib.mkDefault true;
 
-  # Creating groups
-  users.groups.uinput = {};
+  imports = [
+    # TODO temporary
+    ../modules/nixos/bootloader.nix
+    ../modules/nixos/nix.nix
 
-  # Setting up the uinput group, required for kanata
-  services.udev.extraRules = ''
-    KERNEL=="uinput", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput"
-  '';
+    ../modules/nixos/hardware/network.nix
+    ../modules/nixos/hardware/bluetooth.nix
+
+    ./${hostname}/configuration.nix
+    ./${hostname}/packages.nix
+    ./${hostname}/hardware.nix
+  ];
 
   system.stateVersion = host.stateVersion;
 }

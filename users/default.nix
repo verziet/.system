@@ -13,8 +13,8 @@
 }: {
   imports = [
     ./${username}/home.nix
-    ./${username}/specific/${hostname}.nix
-  ];
+  ] ++ lib.optional (builtins.pathExists ./${username}/per-host/${hostname}.nix)
+    ./${username}/per-host/${hostname}.nix;
 
   nixpkgs.config.allowUnfree = true;
   nixpkgs.config.cudaSupport = true;
