@@ -11,9 +11,11 @@
   configuration,
   ...
 }: {
-  imports = [
-    ./${username}/home.nix
-  ] ++ lib.optional (builtins.pathExists ./${username}/per-host/${hostname}.nix)
+  imports =
+    [
+      ./${username}/home.nix
+    ]
+    ++ lib.optional (builtins.pathExists ./${username}/per-host/${hostname}.nix)
     ./${username}/per-host/${hostname}.nix;
 
   nixpkgs.config.allowUnfree = true;

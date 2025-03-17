@@ -27,15 +27,15 @@
       settings = {
         experimental-features = lib.mkDefault ["flakes" "nix-command"];
         flake-registry = lib.mkDefault "";
- 
-         # https://github.com/NixOS/nix/issues/9574
-         nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
 
-        substituters = lib.mkDefault ["https://hyprland.cachix.org"];
-        trusted-public-keys = lib.mkDefault ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+        # https://github.com/NixOS/nix/issues/9574
+        nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
+
+        substituters = lib.mkIf config.hyprland.enableModule (lib.mkDefault ["https://hyprland.cachix.org"]);
+        trusted-public-keys = lib.mkIf config.hyprland.enableModule (lib.mkDefault ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="]);
       };
     };
-  
+
     # but NIX_PATH is still used by many useful tools, so we set it to the same value as the one used by this flake.
     # Make `nix repl '<nixpkgs>'` use the same nixpkgs as the one used by this flake.
     environment.etc."nix/inputs/nixpkgs".source = "${inputs.nixpkgs}";

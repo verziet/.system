@@ -4,13 +4,13 @@
   config,
   ...
 }: {
-  options."bootloader".enableModule = lib.mkOption {
-    description = "Enable the bootloader module";
+  options."grub".enableModule = lib.mkOption {
+    description = "Enable the grub module";
     default = true;
     type = lib.types.bool;
   };
 
-  config = lib.mkIf config."bootloader".enableModule {
+  config = lib.mkIf config."grub".enableModule {
     boot.loader = {
       timeout = lib.mkDefault null;
       efi.canTouchEfiVariables = lib.mkDefault true;
@@ -26,7 +26,7 @@
           }
         '';
       in {
-        theme = lib.mkDefault pkgs.minimal-grub-theme;
+        theme = lib.mkDefault ./themes/grub/virtuaverse;
 
         enable = lib.mkForce true;
         useOSProber = lib.mkDefault true;
@@ -34,9 +34,11 @@
         device = lib.mkDefault "nodev";
 
         backgroundColor = lib.mkDefault "#000000";
-        splashImage = lib.mkForce null;
+        splashImage = lib.mkOverride 999 null;
 
-        extraInstallCommands = lib.mkDefault ''echo "${extraEntries}" >> /boot/grub/grub.cfg'';
+        extraInstallCommands = lib.mkDefault ''
+	  echo "${extraEntries}" >> /boot/grub/grub.cfg
+	''; # TODO rename Windows entries
       };
     };
   };

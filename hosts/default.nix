@@ -27,7 +27,7 @@
     nix-output-monitor # nom, cool dependency graphs
     nvd # version diff tool
 
-    # Some control utilities
+    # Some controls utilities
     brightnessctl
     playerctl
   ];
@@ -53,11 +53,15 @@
 
   imports = [
     # TODO temporary
-    ../modules/nixos/bootloader.nix
+    ../modules/nixos/bootloader/grub.nix
     ../modules/nixos/nix.nix
 
     ../modules/nixos/hardware/network.nix
+    ../modules/nixos/hardware/pipewire.nix
     ../modules/nixos/hardware/bluetooth.nix
+
+    ../modules/nixos/services/firewall.nix
+    ../modules/nixos/services/ssh.nix
 
     ./${hostname}/configuration.nix
     ./${hostname}/packages.nix

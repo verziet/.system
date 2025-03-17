@@ -1,16 +1,15 @@
 {
-  pkgs,
   lib,
   config,
   ...
 }: {
-  options."audio".enableModule = lib.mkOption {
-    description = "Enable the audio module";
+  options."pipewire".enableModule = lib.mkOption {
+    description = "Enable the pipewire module";
     default = true;
     type = lib.types.bool;
   };
 
-  config = lib.mkIf config."audio".enableModule {
+  config = lib.mkIf config."pipewire".enableModule {
     services.pipewire = {
       enable = lib.mkForce true;
       alsa.enable = lib.mkDefault true;
@@ -24,4 +23,3 @@
     security.rtkit.enable = lib.mkDefault true;
   };
 }
-

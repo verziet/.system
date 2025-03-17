@@ -305,19 +305,13 @@
   home.file = {
     ".zshrc" = {
       text = ''
+        alias hyprland="exec uwsm start hyprland-uwsm.desktop"
+        alias gnome="XDG_SESSION_TYPE=wayland exec dbus-run-session gnome-session"
         export EDITOR=vim
                set -o vi
                bindkey '^H' backward-kill-word
                bindkey '5~' kill-word
         clear
-      '';
-    };
-
-    ".zprofile" = {
-      text = ''
-        if uwsm check may-start; then
-          exec uwsm start hyprland-uwsm.desktop
-        fi
       '';
     };
 
