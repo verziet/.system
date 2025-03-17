@@ -24,6 +24,7 @@
           # List of host's users
           users = [
             "verz"
+            "verz2"
             # Add more users if desired
           ];
         };
@@ -31,6 +32,12 @@
         # Add more hosts if desired
       };
     };
+
+    homeManagerModules = [
+      inputs.textfox.homeManagerModules.default
+      inputs.nixcord.homeManagerModules.nixcord
+      inputs.spicetify-nix.homeManagerModules.default
+    ];
 
     # List of all supported systems
     supportedSystems = {
@@ -98,7 +105,10 @@
               // {
                 "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
                   pkgs = nixpkgs.legacyPackages.${host.system};
-                  modules = [./users];
+                  modules = [
+                    ./users
+                    {imports = homeManagerModules;}
+                  ];
 
                   # Stuff passed to modules as inputs/arguments
                   extraSpecialArgs = {
@@ -128,7 +138,7 @@
     # Darwin (macos) configurations flake
     nix-darwin = {
       url = "github:LnL7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs"; # Would dupe nixpkgs otherwise (more storage eaten)
+      inputs.nixpkgs.follows = "nixpkgs";
     };
 
     # Home manager configurations flake

@@ -10,46 +10,31 @@
   configuration,
   ...
 }: {
-  nixpkgs.overlays = [
-  ];
-
   home.packages = with pkgs;
     [
-      firefox
-      stremio
-      mission-center
-      libreoffice
-      bottles
-      lutris
-      heroic
-      ticktick
-      google-chrome
-      wineWowPackages.waylandFull
-      protonvpn-gui
-      ranger
       neovim
+      ranger
       wofi
+
+      stremio
+      libreoffice
+      protonvpn-gui
+      heroic
+
       pavucontrol
       gnome-control-center
+      mission-center
 
       swww
       kanata
-
-      /*
-        #ags
-         ollama
-      pywal
-      sassc
-      (python311.withPackages (p: [
-        p.material-color-utilities
-        p.pywayland
-      ]))
-      */
     ]
-    ++ [
-      pkgs-stable.protonmail-desktop
-      pkgs-stable.proton-pass
-    ]
+    ++ (with pkgs-stable; [
+      protonmail-desktop
+      proton-pass
+    ])
+    ++ (with pkgs-master; [
+      #
+    ])
     ++ [
       inputs.zen-browser.packages."${host.system}".default
     ];

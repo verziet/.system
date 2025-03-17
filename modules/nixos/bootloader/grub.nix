@@ -26,9 +26,9 @@
           }
         '';
       in {
+        enable = lib.mkForce true;
         theme = lib.mkDefault ./themes/grub/virtuaverse;
 
-        enable = lib.mkForce true;
         useOSProber = lib.mkDefault true;
         efiSupport = lib.mkDefault true;
         device = lib.mkDefault "nodev";
@@ -37,8 +37,8 @@
         splashImage = lib.mkOverride 999 null;
 
         extraInstallCommands = lib.mkDefault ''
-	  echo "${extraEntries}" >> /boot/grub/grub.cfg
-	''; # TODO rename Windows entries
+          echo "${extraEntries}" >> /boot/grub/grub.cfg
+        ''; # TODO rename Windows entries
       };
     };
   };

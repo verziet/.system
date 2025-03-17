@@ -5,7 +5,17 @@
   inputs,
   ...
 }: {
-  environment.systemPackages = with pkgs; [
-    neofetch
-  ];
+  environment.systemPackages = with pkgs;
+    [
+      neofetch
+    ]
+    ++ (with pkgs-stable; [
+      #
+    ])
+    ++ (with pkgs-master; [
+      #
+    ])
+    ++ [
+      #
+    ];
 }

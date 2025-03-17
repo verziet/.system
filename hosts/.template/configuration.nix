@@ -10,5 +10,5 @@
   configuration,
   ...
 }: {
-  # All your host specific configuration belongs here
+  # All your host specific configuration belong here
 }
