@@ -24,7 +24,6 @@
           # List of host's users
           users = [
             "verz"
-            "verz2"
             # Add more users if desired
           ];
         };
