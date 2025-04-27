@@ -14,6 +14,23 @@
   };
 
   config = lib.mkIf config."hyprland".enableModule {
+    /**
+    home.file = {
+      ".config/uwsm/env" = {
+        text = ''
+          export NIXOS_OZONE_WL=1
+
+          export QT_AUTO_SCREEN_SCALE_FACTOR=1
+          export QT_QPA_PLATFORM=wayland;xcb
+          export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
+          export QT_QPA_PLATFORMTHEME=qt5ct
+        '' + lib.optional (config.nvidia.enableModule) ''
+          j
+        '';
+      };
+    };
+    **/
+
     wayland.windowManager.hyprland = {
       enable = lib.mkForce true;
 
@@ -44,7 +61,7 @@
 
         exec = lib.mkDefault [
           "kanata -c $HOME/kanata.kbd"
-          "ags run /home/${username}/.config/ags/simple-bar"
+          "ags run /home/${username}/.config/ags/bar"
           "ags run /home/${username}/.config/ags/applauncher"
         ];
 

@@ -21,6 +21,10 @@
     ../../modules/nixos/services/kanata.nix
   ];
 
+	environment.sessionVariables = {
+		NH_FLAKE = "/home/verz/.system/";
+	};
+
   services.hardware.bolt.enable = true;
 
   fonts.packages = with pkgs; [

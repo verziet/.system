@@ -17,7 +17,7 @@
       enable = lib.mkForce true;
       wayland.enable = lib.mkForce true;
       package = lib.mkForce pkgs.kdePackages.sddm;
-			#theme = lib.mkDefault "sddm-astronaut-theme";
+      #theme = lib.mkDefault "sddm-astronaut-theme";
       extraPackages = with pkgs; [
         #kdePackages.qtmultimedia
         #kdePackages.qtsvg

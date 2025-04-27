@@ -24,7 +24,7 @@
           # List of modules whose options get exposed in your host configuration file
           modules = with inputs; [
             # stylix.nixosModules.stylix
-					];
+          ];
 
           # Set of host's users
           users = {
@@ -34,7 +34,8 @@
                 ags.homeManagerModules.default
                 nvf.homeManagerModules.default
                 stylix.homeManagerModules.stylix
-                nixcord.homeManagerModules.default
+                nixcord.homeModules.default
+                textfox.homeManagerModules.default
                 spicetify-nix.homeManagerModules.default
               ];
             };
