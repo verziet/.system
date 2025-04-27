@@ -6,7 +6,7 @@
 }: {
   options."network".enableModule = lib.mkOption {
     description = "Enable the network module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

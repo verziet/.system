@@ -4,11 +4,12 @@
   lib,
   config,
   host,
+  username,
   ...
 }: {
   options."hyprland".enableModule = lib.mkOption {
     description = "Enable the hyprland module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 
@@ -16,10 +17,23 @@
     wayland.windowManager.hyprland = {
       enable = lib.mkForce true;
 
+      plugins = [
+        inputs.split-monitor-workspaces.packages.${host.system}.split-monitor-workspaces
+      ];
+
       systemd.enable = lib.mkForce false; # Required for Hyprland UWSM
       package = lib.mkDefault inputs.hyprland.packages.${host.system}.hyprland;
 
       settings = lib.mkDefault {
+        plugin = lib.mkDefault {
+          split-monitor-workspaces = lib.mkDefault {
+            count = lib.mkDefault 10;
+            keep_focused = lib.mkDefault 0;
+            enable_notifications = lib.mkDefault 0;
+            enable_persistent_workspaces = lib.mkDefault 1;
+          };
+        };
+
         "$mainMod" = "SUPER";
         "$terminal" = "kitty";
         #"$menu" = "wofi";
@@ -30,11 +44,15 @@
 
         exec = lib.mkDefault [
           "kanata -c $HOME/kanata.kbd"
+          "ags run /home/${username}/.config/ags/simple-bar"
+          "ags run /home/${username}/.config/ags/applauncher"
         ];
 
         monitor = lib.mkDefault [
           # TODO
-          "eDP-1, 1920x1080@144, 0x0, 1.2"
+          "desc:Chimei Innolux Corporation 0x1521, 1920x1080@144, 0x0, 1.2"
+          "desc:Microstep MSI G27CQ4 0x000008D3,2560x1440@120,-320x-1440,1"
+          "desc:Vestel Elektronik Sanayi ve Ticaret A. S. 24W_LCD_TV,1920x1080@60,-1400x-1440,1,transform,1"
         ];
 
         general = lib.mkDefault {
@@ -43,8 +61,8 @@
 
           border_size = lib.mkDefault 1;
 
-          "col.active_border" = lib.mkDefault "rgba(ffffffff)";
-          "col.inactive_border" = lib.mkDefault "rgba(ffffffff)";
+          "col.active_border" = lib.mkDefault "rgba(00000000)";
+          "col.inactive_border" = lib.mkDefault "rgba(00000000)";
 
           resize_on_border = lib.mkDefault true;
 
@@ -108,7 +126,7 @@
 
         bind = lib.mkDefault [
           "$mainMod,       Q, exec, $terminal"
-          "$mainMod,       SPACE, exec, wofi --show drun"
+          "$mainMod,       SPACE, exec, ags toggle launcher --instance launcher"
           "$mainMod,       C, killactive,"
           "$mainMod,       M, exit,"
           "$mainMod,       F, togglefloating,"
@@ -133,33 +151,38 @@
           "$mainMod SHIFT, K,    resizeactive,  0 -60"
           "$mainMod SHIFT, J,  resizeactive,  0  60"
 
+          # Switching monitors
+          "Super_R&Alt_R&Shift_R, 1, focusmonitor, desc:Chimei Innolux Corporation 0x1521"
+          "Super_R&Alt_R&Shift_R, 2, focusmonitor, desc:Microstep MSI G27CQ4 0x000008D3"
+          "Super_R&Alt_R&Shift_R, 3, focusmonitor, desc:Vestel Elektronik Sanayi ve Ticaret A. S. 24W_LCD_TV"
+
           # Switching workspaces
-          "$mainMod, 1, workspace, 1"
-          "$mainMod, 2, workspace, 2"
-          "$mainMod, 3, workspace, 3"
-          "$mainMod, 4, workspace, 4"
-          "$mainMod, 5, workspace, 5"
-          "$mainMod, 6, workspace, 6"
-          "$mainMod, 7, workspace, 7"
-          "$mainMod, 8, workspace, 8"
-          "$mainMod, 9, workspace, 9"
-          "$mainMod, 0, workspace, 10"
+          "$mainMod, 1, split-workspace, 1"
+          "$mainMod, 2, split-workspace, 2"
+          "$mainMod, 3, split-workspace, 3"
+          "$mainMod, 4, split-workspace, 4"
+          "$mainMod, 5, split-workspace, 5"
+          "$mainMod, 6, split-workspace, 6"
+          "$mainMod, 7, split-workspace, 7"
+          "$mainMod, 8, split-workspace, 8"
+          "$mainMod, 9, split-workspace, 9"
+          "$mainMod, 0, split-workspace, 10"
 
           # Moving windows to workspaces
-          "$mainMod SHIFT, 1, movetoworkspacesilent, 1"
-          "$mainMod SHIFT, 2, movetoworkspacesilent, 2"
-          "$mainMod SHIFT, 3, movetoworkspacesilent, 3"
-          "$mainMod SHIFT, 4, movetoworkspacesilent, 4"
-          "$mainMod SHIFT, 5, movetoworkspacesilent, 5"
-          "$mainMod SHIFT, 6, movetoworkspacesilent, 6"
-          "$mainMod SHIFT, 7, movetoworkspacesilent, 7"
-          "$mainMod SHIFT, 8, movetoworkspacesilent, 8"
-          "$mainMod SHIFT, 9, movetoworkspacesilent, 9"
-          "$mainMod SHIFT, 0, movetoworkspacesilent, 10"
+          "$mainMod SHIFT, 1, split-movetoworkspacesilent, 1"
+          "$mainMod SHIFT, 2, split-movetoworkspacesilent, 2"
+          "$mainMod SHIFT, 3, split-movetoworkspacesilent, 3"
+          "$mainMod SHIFT, 4, split-movetoworkspacesilent, 4"
+          "$mainMod SHIFT, 5, split-movetoworkspacesilent, 5"
+          "$mainMod SHIFT, 6, split-movetoworkspacesilent, 6"
+          "$mainMod SHIFT, 7, split-movetoworkspacesilent, 7"
+          "$mainMod SHIFT, 8, split-movetoworkspacesilent, 8"
+          "$mainMod SHIFT, 9, split-movetoworkspacesilent, 9"
+          "$mainMod SHIFT, 0, split-movetoworkspacesilent, 10"
 
           # Scratchpad
           "$mainMod,       S, togglespecialworkspace,  magic"
-          "$mainMod SHIFT, S, movetoworkspace, special:magic"
+          "$mainMod SHIFT, S, split-movetoworkspace, special:magic"
         ];
 
         # Move/resize windows with mainMod + LMB/RMB and dragging

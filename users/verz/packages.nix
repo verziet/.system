@@ -12,10 +12,10 @@
 }: {
   home.packages = with pkgs;
     [
-      neovim
       ranger
-      wofi
+      dconf
 
+      vscode
       stremio
       libreoffice
       protonvpn-gui
@@ -27,6 +27,11 @@
 
       swww
       kanata
+
+      nodejs
+      nodePackages.pnpm
+
+      btop
     ]
     ++ (with pkgs-stable; [
       protonmail-desktop

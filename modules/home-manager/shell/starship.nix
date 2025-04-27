@@ -8,7 +8,7 @@
 }: {
   options."starship".enableModule = lib.mkOption {
     description = "Enable the starship module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

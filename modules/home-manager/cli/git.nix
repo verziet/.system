@@ -8,7 +8,7 @@
 }: {
   options."git".enableModule = lib.mkOption {
     description = "Enable the git module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

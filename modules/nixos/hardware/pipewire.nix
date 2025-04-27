@@ -5,7 +5,7 @@
 }: {
   options."pipewire".enableModule = lib.mkOption {
     description = "Enable the pipewire module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

@@ -6,7 +6,7 @@
 }: {
   options."bluetooth".enableModule = lib.mkOption {
     description = "Enable the bluetooth module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

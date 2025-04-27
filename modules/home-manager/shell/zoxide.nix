@@ -8,7 +8,7 @@
 }: {
   options."zoxide".enableModule = lib.mkOption {
     description = "Enable the zoxide module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

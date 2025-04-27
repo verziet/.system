@@ -12,26 +12,29 @@
 }: {
   imports = [
     ../../modules/nixos/hardware/nvidia.nix
+    ../../modules/nixos/hardware/displaylink.nix
 
+    ../../modules/nixos/desktop/sddm.nix
     ../../modules/nixos/desktop/hyprland.nix
     ../../modules/nixos/desktop/gnome.nix
 
     ../../modules/nixos/services/kanata.nix
   ];
 
-  services.displayManager.sddm = {
-    enable = true;
-    wayland.enable = true;
-    package = pkgs.kdePackages.sddm;
-    theme = "sddm-astronaut-theme";
-    extraPackages = with pkgs; [
-      kdePackages.qtmultimedia
-      kdePackages.qtsvg
-      kdePackages.qtvirtualkeyboard
-    ];
-  };
+  services.hardware.bolt.enable = true;
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono
   ];
+
+  time.timeZone = "Europe/Prague";
+  i18n.defaultLocale = "en_US.UTF-8";
+
+  # Optionally (BEWARE: requires a different format with the added /UTF-8)
+  i18n.supportedLocales = ["en_US.UTF-8/UTF-8"];
+
+  # Optionally
+  i18n.extraLocaleSettings = {
+    LC_ALL = "en_US.UTF-8"; # This overrides all other LC_* settings.
+  };
 }

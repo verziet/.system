@@ -1,6 +1,6 @@
 {
   description = ''
-    My super duper flake.nix file
+    My super duper flake
   ''; #TODO
 
   # Flake outputs
@@ -15,30 +15,39 @@
   } @ inputs: let
     #FIXME Change the configuration to your liking
     configuration = {
-      # List of all hosts with their respective settings
+      # Set of all hosts with their respective settings
       hosts = {
         "leet" = {
-          system = "x86_64-linux"; # System architecture, one of the supported systems defined below
-          stateVersion = "24.11"; # Should match the iso's version for compatibility
+          system = "x86_64-linux"; # System architecture, one of the supported systems defined in a `supportedSystems` set below
+          stateVersion = "24.11"; # Should match the iso's version for compatibility or whatever
 
-          # List of host's users
-          users = [
-            "verz"
-            # Add more users if desired
-          ];
+          # List of modules whose options get exposed in your host configuration file
+          modules = with inputs; [
+            # stylix.nixosModules.stylix
+					];
+
+          # Set of host's users
+          users = {
+            "verz" = {
+              # List of modules whose options get exposed in your home configuration file
+              modules = with inputs; [
+                ags.homeManagerModules.default
+                nvf.homeManagerModules.default
+                stylix.homeManagerModules.stylix
+                nixcord.homeManagerModules.default
+                spicetify-nix.homeManagerModules.default
+              ];
+            };
+
+            # Second user ...
+          };
         };
 
-        # Add more hosts if desired
+        # Second host ...
       };
     };
 
-    homeManagerModules = [
-      inputs.textfox.homeManagerModules.default
-      inputs.nixcord.homeManagerModules.nixcord
-      inputs.spicetify-nix.homeManagerModules.default
-    ];
-
-    # List of all supported systems
+    # Set of all supported systems
     supportedSystems = {
       linux = [
         "x86_64-linux"
@@ -53,41 +62,42 @@
     };
 
     inherit (nixpkgs) lib; # shorthand for nixpkgs.lib
-    inherit (self) outputs; # shorthand for self.outputs
 
     forAllSystems = lib.genAttrs (lib.concatLists (lib.attrValues supportedSystems));
   in {
-    # Creating multiple nixos configurations using the hosts set, to select one during install/rebuild: --flake path#hostname
+    # Creating multiple nixos configurations using the hosts set, to select one during install/rebuild: --flake flakepath#hostname
     nixosConfigurations = lib.mapAttrs (
       hostname: host:
         lib.nixosSystem {
           system = host.system;
-          modules = [./hosts];
+          modules = [./hosts] ++ host.modules;
 
           # Stuff passed to modules as inputs/arguments
           specialArgs = {
             # pkgs passed by default
             pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
             pkgs-master = nixpkgs-master.legacyPackages.${host.system};
-            inherit inputs host hostname configuration;
+
+            inherit inputs host hostname;
           };
         }
     ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."linux") configuration.hosts);
     # ^ nixosConfigurations output set for linux hosts
 
     # I'm not sure whether this works
-    # Creating multiple darwin (macos) configurations using the hosts set, to select one: --flake path#hostname
+    # Creating multiple darwin (macos) configurations using the hosts set, to select one: --flake flakepath#hostname
     darwinConfigurations = lib.mapAttrs (
       hostname: host:
         nix-darwin.lib.darwinSystem {
           system = host.system;
-          modules = [./hosts];
+          modules = [./hosts] ++ host.modules;
 
           # Stuff passed to modules as inputs/arguments
           specialArgs = {
             # pkgs passed by default
             pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
             pkgs-master = nixpkgs-master.legacyPackages.${host.system};
+
             inherit inputs host hostname configuration;
           };
         }
@@ -98,23 +108,21 @@
     homeConfigurations =
       lib.attrsets.foldlAttrs (
         _acc: hostname: host:
-          lib.foldl (
-            _acc2: username:
+          lib.foldlAttrs (
+            _acc2: username: user:
               _acc2
               // {
                 "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
                   pkgs = nixpkgs.legacyPackages.${host.system};
-                  modules = [
-                    ./users
-                    {imports = homeManagerModules;}
-                  ];
+                  modules = [./users] ++ user.modules;
 
                   # Stuff passed to modules as inputs/arguments
                   extraSpecialArgs = {
                     # pkgs passed by default
                     pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
                     pkgs-master = nixpkgs-master.legacyPackages.${host.system};
-                    inherit inputs host hostname username configuration;
+
+                    inherit inputs host hostname username;
                   };
                 };
               }
@@ -130,9 +138,9 @@
 
   # Flake inputs
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable"; # Unstable branch, used as default (ily Arch <3)
-    nixpkgs-stable.url = "github:nixos/nixpkgs?ref=nixos-24.11"; # stable branch
-    nixpkgs-master.url = "github:nixos/nixpkgs?ref=master"; # Master branch (extreme rolling release), won't ever use this (i think)
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-unstable"; # Unstable branch, used as default
+    nixpkgs-stable.url = "github:nixos/nixpkgs?ref=nixos-24.11"; # Stable branch
+    nixpkgs-master.url = "github:nixos/nixpkgs?ref=master"; # Master branch, won't ever use this (i think)
 
     # Darwin (macos) configurations flake
     nix-darwin = {
@@ -153,12 +161,28 @@
     # Hyprland from source flake
     hyprland = {
       url = "github:hyprwm/Hyprland";
+    };
+
+    split-monitor-workspaces = {
+      url = "github:Duckonaut/split-monitor-workspaces";
+      inputs.hyprland.follows = "hyprland"; # <- make sure this line is present for the plugin to work as intended
+    };
+
+    # Widgets flake)
+    ags = {
+      url = "github:Aylur/ags";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Widgets flake
-    ags = {
-      url = "github:Aylur/ags";
+    # Neovim flake
+    nvf = {
+      url = "github:notashelf/nvf";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    # Wide themes flake
+    stylix = {
+      url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

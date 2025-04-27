@@ -8,7 +8,7 @@
 }: {
   options."nixcord".enableModule = lib.mkOption {
     description = "Enable the nixcord module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 
@@ -35,7 +35,7 @@
         };
 
         themeLinks = lib.mkDefault [
-          "https://raw.githubusercontent.com/refact0r/system24/refs/heads/main/theme/system24.theme.css"
+          #"https://raw.githubusercontent.com/refact0r/system24/refs/heads/main/theme/system24.theme.css"
         ];
       };
 

@@ -8,7 +8,7 @@
 }: {
   options."gnome".enableModule = lib.mkOption {
     description = "Enable the gnome module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

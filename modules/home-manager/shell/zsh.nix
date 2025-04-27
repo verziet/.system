@@ -8,7 +8,7 @@
 }: {
   options."zsh".enableModule = lib.mkOption {
     description = "Enable the zsh module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

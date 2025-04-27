@@ -8,7 +8,7 @@
 }: {
   options."ssh".enableModule = lib.mkOption {
     description = "Enable the ssh module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

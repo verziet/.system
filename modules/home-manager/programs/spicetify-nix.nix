@@ -8,7 +8,7 @@
 }: {
   options."spicetify-nix".enableModule = lib.mkOption {
     description = "Enable the spicetify-nix module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 
@@ -39,7 +39,7 @@
         shuffle
       ]);
 
-      theme = lib.mkDefault spicePkgs.themes.text;
+      #theme = lib.mkDefault spicePkgs.themes.text;
     };
   };
 }

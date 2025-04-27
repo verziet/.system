@@ -16,10 +16,25 @@
 
     ../../modules/home-manager/desktop/hyprland.nix
 
+    ../../modules/home-manager/programs/ags.nix
+    ../../modules/home-manager/programs/nvf.nix
     ../../modules/home-manager/programs/textfox.nix
     ../../modules/home-manager/programs/nixcord.nix
     ../../modules/home-manager/programs/spicetify-nix.nix
   ];
+
+  stylix.enable = false;
+  stylix.base16Scheme = "${pkgs.base16-schemes}/share/themes/catppuccin-mocha.yaml";
+  stylix.image = ../../wallpaper.png;
+  stylix.polarity = "dark";
+  stylix.targets.hyprland.enable = false;
+  stylix.targets.kitty.enable = false;
+  stylix.targets.hyprlock.enable = false;
+  stylix.targets.fuzzel.enable = false;
+  stylix.targets.foot.enable = false;
+  #stylix.targets.spicetify.enable = false;
+  #stylix.targets.nixcord.enable = false;
+  stylix.targets.firefox.profileNames = [username];
 
   xdg.desktopEntries = {
     control-center = {
@@ -42,6 +57,7 @@
     #todo this should be host specific instead
     ".config/uwsm/env" = {
       text = ''
+        export XDG_CURRENT_DESKTOP=Hyprland
         export LIBVA_DRIVER_NAME=nvidia
         export __GLX_VENDOR_LIBRARY_NAME=nvidia
         export NIXOS_OZONE_WL=1

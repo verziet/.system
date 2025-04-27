@@ -9,7 +9,7 @@
 }: {
   options."textfox".enableModule = lib.mkOption {
     description = "Enable the textfox module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 

@@ -7,12 +7,12 @@
 }: {
   options."nvidia".enableModule = lib.mkOption {
     description = "Enable the nvidia module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 
   config = lib.mkIf config."nvidia".enableModule {
-    services.xserver.videoDrivers = lib.mkForce ["nvidia"];
+    services.xserver.videoDrivers = ["nvidia"];
 
     hardware = let
       pkgs-hyprland = inputs.hyprland.inputs.nixpkgs.legacyPackages.${host.system};
@@ -21,8 +21,8 @@
         enable = lib.mkForce true;
         enable32Bit = lib.mkForce true;
 
-        package = lib.mkIf config.hyprland.enableModule (lib.mkOverride 999 pkgs-hyprland.mesa.drivers);
-        package32 = lib.mkIf config.hyprland.enableModule (lib.mkOverride 999 pkgs-hyprland.pkgsi686Linux.mesa.drivers);
+        package = lib.mkIf config.hyprland.enableModule (lib.mkOverride 999 pkgs-hyprland.mesa);
+        package32 = lib.mkIf config.hyprland.enableModule (lib.mkOverride 999 pkgs-hyprland.pkgsi686Linux.mesa);
       };
 
       nvidia = {

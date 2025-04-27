@@ -1,4 +1,5 @@
 {
+  self,
   pkgs,
   pkgs-stable,
   pkgs-master,
@@ -7,10 +8,7 @@
 }: {
   environment.systemPackages = with pkgs;
     [
-      neofetch
-      (pkgs.callPackage ../../pkgs/sddm-astronaut-theme.nix {
-        theme = "japanese_aesthetic";
-      })
+      #
     ]
     ++ (with pkgs-stable; [
       #

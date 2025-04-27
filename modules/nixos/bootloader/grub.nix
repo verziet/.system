@@ -6,7 +6,7 @@
 }: {
   options."grub".enableModule = lib.mkOption {
     description = "Enable the grub module";
-    default = true;
+    default = false;
     type = lib.types.bool;
   };
 
@@ -17,19 +17,26 @@
 
       grub = let
         extraEntries = ''
-          menuentry "Reboot" --class restart {
-            reboot
+          menuentry 'Windows' --class windows --class os $menuentry_id_option 'osprober-efi-2275-5F7C' {
+          	insmod part_gpt
+          	insmod fat
+          	search --no-floppy --fs-uuid --set=root 2275-5F7C
+          	chainloader /efi/Microsoft/Boot/bootmgfw.efi
           }
 
-          menuentry "Shutdown" --class shutdown {
-            halt
-          }
+					menuentry "Reboot" --class restart {
+						reboot
+					}
+
+					menuentry "Shutdown" --class shutdown {
+						halt
+					}
         '';
       in {
         enable = lib.mkForce true;
-        theme = lib.mkDefault ./themes/grub/virtuaverse;
+        theme = lib.mkDefault pkgs.minimal-grub-theme;
 
-        useOSProber = lib.mkDefault true;
+        useOSProber = lib.mkDefault false;
         efiSupport = lib.mkDefault true;
         device = lib.mkDefault "nodev";
 
