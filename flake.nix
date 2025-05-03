@@ -17,19 +17,19 @@
     configuration = {
       # Set of all hosts with their respective settings
       hosts = {
-        "leet" = {
+        "leet" = { # HOSTNAME
           system = "x86_64-linux"; # System architecture, one of the supported systems defined in a `supportedSystems` set below
           stateVersion = "24.11"; # Should match the iso's version for compatibility or whatever
 
-          # List of modules whose options get exposed in your host configuration file
+          # List of modules whose options get exposed in your host configuration
           modules = with inputs; [
             # stylix.nixosModules.stylix
           ];
 
           # Set of host's users
           users = {
-            "verz" = {
-              # List of modules whose options get exposed in your home configuration file
+            "verz" = { # USERNAME
+              # List of modules whose options get exposed in your home configuration
               modules = with inputs; [
                 ags.homeManagerModules.default
                 nvf.homeManagerModules.default
