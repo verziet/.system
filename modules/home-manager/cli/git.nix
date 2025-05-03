@@ -17,8 +17,8 @@
       enable = lib.mkForce true;
 
       extraConfig = {
-        user.name = lib.mkDefault "verz";
-        user.email = lib.mkDefault "verzleet@gmail.com";
+        user.name = lib.mkDefault "verziet";
+        user.email = lib.mkDefault "garlic-boss-batch@duck.com";
         init.defaultBranch = lib.mkDefault "main";
       };
     };

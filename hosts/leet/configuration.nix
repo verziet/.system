@@ -5,6 +5,7 @@
   inputs,
   lib,
   config,
+	options,
   host,
   hostname,
   configuration,
@@ -20,6 +21,13 @@
 
     ../../modules/nixos/services/kanata.nix
   ];
+
+	programs.nix-ld.enable = true;
+  programs.nix-ld.libraries = with pkgs; [
+		biome
+  ];
+
+	networking.timeServers = options.networking.timeServers.default;
 
 	environment.sessionVariables = {
 		NH_FLAKE = "/home/verz/.system/";
