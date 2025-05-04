@@ -29,7 +29,8 @@
         '';
       };
     };
-    **/
+    *
+    */
 
     wayland.windowManager.hyprland = {
       enable = lib.mkForce true;

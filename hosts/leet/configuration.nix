@@ -5,10 +5,9 @@
   inputs,
   lib,
   config,
-	options,
+  options,
   host,
   hostname,
-  configuration,
   ...
 }: {
   imports = [
@@ -22,16 +21,16 @@
     ../../modules/nixos/services/kanata.nix
   ];
 
-	programs.nix-ld.enable = true;
+  programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
-		biome
+    biome
   ];
 
-	networking.timeServers = options.networking.timeServers.default;
+  networking.timeServers = options.networking.timeServers.default;
 
-	environment.sessionVariables = {
-		NH_FLAKE = "/home/verz/.system/";
-	};
+  environment.sessionVariables = {
+    NH_FLAKE = "/home/verz/.system/";
+  };
 
   services.hardware.bolt.enable = true;
 

@@ -14,9 +14,9 @@
     [
       ranger
       dconf
-			hyprshot
-			google-chrome
-			chromium
+      hyprshot
+      google-chrome
+      chromium
 
       vscode
       stremio

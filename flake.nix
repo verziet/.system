@@ -5,47 +5,43 @@
 
   # Flake outputs
   outputs = {
-    self,
     nixpkgs,
     nixpkgs-stable,
     nixpkgs-master,
-    nix-darwin,
-    home-manager,
     ...
   } @ inputs: let
-    #FIXME Change the configuration to your liking
-    configuration = {
-      # Set of all hosts with their respective settings
-      hosts = {
-        "leet" = { # HOSTNAME
-          system = "x86_64-linux"; # System architecture, one of the supported systems defined in a `supportedSystems` set below
-          stateVersion = "24.11"; # Should match the iso's version for compatibility or whatever
+    # Set of all hosts with their respective settings
+    hosts = {
+      "leet" = {
+        # HOSTNAME
+        system = "x86_64-linux"; # System architecture, one of the supported systems defined in a `supportedSystems` set below
+        stateVersion = "24.11"; # Should match the iso's version for compatibility or whatever
 
-          # List of modules whose options get exposed in your host configuration
-          modules = with inputs; [
-            # stylix.nixosModules.stylix
-          ];
+        # List of modules whose options get exposed in your host configuration
+        modules = with inputs; [
+          # stylix.nixosModules.stylix
+        ];
 
-          # Set of host's users
-          users = {
-            "verz" = { # USERNAME
-              # List of modules whose options get exposed in your home configuration
-              modules = with inputs; [
-                ags.homeManagerModules.default
-                nvf.homeManagerModules.default
-                stylix.homeManagerModules.stylix
-                nixcord.homeModules.default
-                textfox.homeManagerModules.default
-                spicetify-nix.homeManagerModules.default
-              ];
-            };
-
-            # Second user ...
+        # Set of host's users
+        users = {
+          "verz" = {
+            # USERNAME
+            # List of modules whose options get exposed in your home configuration
+            modules = with inputs; [
+              ags.homeManagerModules.default
+              nvf.homeManagerModules.default
+              stylix.homeManagerModules.stylix
+              nixcord.homeModules.default
+              textfox.homeManagerModules.default
+              spicetify-nix.homeManagerModules.default
+            ];
           };
-        };
 
-        # Second host ...
+          # Second user ...
+        };
       };
+
+      # Second host ...
     };
 
     # Set of all supported systems
@@ -63,8 +59,7 @@
     };
 
     inherit (nixpkgs) lib; # shorthand for nixpkgs.lib
-
-    forAllSystems = lib.genAttrs (lib.concatLists (lib.attrValues supportedSystems));
+    forAllSystems = lib.genAttrs (lib.concatLists (lib.attrValues supportedSystems)); # iterates through the `supportedSystems` set
   in {
     # Creating multiple nixos configurations using the hosts set, to select one during install/rebuild: --flake flakepath#hostname
     nixosConfigurations = lib.mapAttrs (
@@ -82,14 +77,14 @@
             inherit inputs host hostname;
           };
         }
-    ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."linux") configuration.hosts);
+    ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."linux") hosts);
     # ^ nixosConfigurations output set for linux hosts
 
     # I'm not sure whether this works
-    # Creating multiple darwin (macos) configurations using the hosts set, to select one: --flake flakepath#hostname
+    # Creating multiple darwin (macos) configurations using the hosts set, to select one during install/rebuild: --flake flakepath#hostname
     darwinConfigurations = lib.mapAttrs (
       hostname: host:
-        nix-darwin.lib.darwinSystem {
+        inputs.nix-darwin.lib.darwinSystem {
           system = host.system;
           modules = [./hosts] ++ host.modules;
 
@@ -99,10 +94,10 @@
             pkgs-stable = nixpkgs-stable.legacyPackages.${host.system};
             pkgs-master = nixpkgs-master.legacyPackages.${host.system};
 
-            inherit inputs host hostname configuration;
+            inherit inputs host hostname;
           };
         }
-    ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."mac") configuration.hosts);
+    ) (lib.attrsets.filterAttrs (_: host: lib.elem host.system supportedSystems."mac") hosts);
     # ^ darwinConfigurations output set for mac hosts
 
     # Creating multiple home configurations using the users lists while looping through hosts
@@ -113,7 +108,7 @@
             _acc2: username: user:
               _acc2
               // {
-                "${username}@${hostname}" = home-manager.lib.homeManagerConfiguration {
+                "${username}@${hostname}" = inputs.home-manager.lib.homeManagerConfiguration {
                   pkgs = nixpkgs.legacyPackages.${host.system};
                   modules = [./users] ++ user.modules;
 
@@ -131,10 +126,10 @@
           _acc
           host.users
       ) {}
-      configuration.hosts;
+      hosts;
 
-    # Most popular formatter, use with nix fmt
     formatter = forAllSystems (system: nixpkgs.legacyPackages.${system}.alejandra);
+    packages = forAllSystems (system: nixpkgs.legacyPackages.${system});
   };
 
   # Flake inputs
@@ -162,6 +157,8 @@
     # Hyprland from source flake
     hyprland = {
       url = "github:hyprwm/Hyprland";
+      # inputs.nixpkgs.follows = "nixpkgs";
+      # ^ commented because of cachix
     };
 
     split-monitor-workspaces = {
@@ -169,7 +166,7 @@
       inputs.hyprland.follows = "hyprland"; # <- make sure this line is present for the plugin to work as intended
     };
 
-    # Widgets flake)
+    # Widgets flake
     ags = {
       url = "github:Aylur/ags";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -181,7 +178,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    # Wide themes flake
+    # System-wide themes flake
     stylix = {
       url = "github:danth/stylix";
       inputs.nixpkgs.follows = "nixpkgs";

@@ -7,7 +7,6 @@
   config,
   host,
   hostname,
-  configuration,
   ...
 }: {
   # Modules
@@ -77,8 +76,8 @@
       # https://github.com/NixOS/nix/issues/9574
       nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
 
-      substituters = lib.mkIf config.hyprland.enableModule (lib.mkDefault ["https://hyprland.cachix.org"]);
-      trusted-public-keys = lib.mkIf config.hyprland.enableModule (lib.mkDefault ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="]);
+      substituters = lib.mkIf config.hyprland.enableModule ["https://hyprland.cachix.org"];
+      trusted-public-keys = lib.mkIf config.hyprland.enableModule ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
   };
 
@@ -90,18 +89,18 @@
   users = {
     defaultUserShell = lib.mkOverride 999 pkgs.zsh;
 
-    users =
-      lib.mapAttrs (username: _: {
-        initialPassword = lib.mkDefault "${username}"; # Setting initial password to the username
-        isNormalUser = lib.mkDefault true;
+    users = lib.mapAttrs (username: _: {
+      initialPassword = lib.mkDefault "${username}"; # Setting initial password to the username
+      isNormalUser = lib.mkDefault true;
 
-        extraGroups = [
-          "wheel"
-          "networkmanager"
-          "audio"
-          "input"
-        ];
-      }) host.users;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "audio"
+        "input"
+      ];
+    })
+    host.users;
   };
 
   # Imports
