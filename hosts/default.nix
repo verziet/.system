@@ -4,7 +4,7 @@
   pkgs-master,
   inputs,
   lib,
-  config,
+  options,
   host,
   hostname,
   ...
@@ -40,9 +40,6 @@
       nh # nix helper
       nix-output-monitor # nom, cool dependency graphs, replacement for nix shell
       nvd # version diff tool
-
-      # Superior terminal
-      kitty
     ]
     ++ (with pkgs-stable; [
       #
@@ -57,12 +54,19 @@
   networking.hostName = lib.mkDefault "${hostname}"; # Default hostname set to "hostname" defined in flake.nix
 
   # Nix settings
+  nix.gc = {
+    # Weekly garbage collection
+    automatic = true;
+    dates = "weekly";
+    options = "--delete-older-than 1w";
+  };
+
   nixpkgs.config.allowUnfree = lib.mkDefault true;
 
   nix = {
-    channel.enable = lib.mkDefault false;
+    channel.enable = lib.mkDefault false; # We use flakes already
 
-    # make `nix run nixpkgs#nixpkgs` use the same nixpkgs as the one used by this flake.
+    # make `nix run pkgs#package` use the same nixpkgs as the one used by this flake.
     registry = {
       pkgs.flake = lib.mkDefault inputs.nixpkgs;
       pkgs-stable.flake = lib.mkDefault inputs.nixpkgs-stable;
@@ -73,11 +77,10 @@
       experimental-features = lib.mkDefault ["flakes" "nix-command"];
       flake-registry = lib.mkDefault "";
 
+      auto-optimise-store = true;
+
       # https://github.com/NixOS/nix/issues/9574
       nix-path = lib.mkForce "nixpkgs=/etc/nix/inputs/nixpkgs";
-
-      substituters = lib.mkIf config.hyprland.enableModule ["https://hyprland.cachix.org"];
-      trusted-public-keys = lib.mkIf config.hyprland.enableModule ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
     };
   };
 
@@ -89,19 +92,22 @@
   users = {
     defaultUserShell = lib.mkOverride 999 pkgs.zsh;
 
-    users = lib.mapAttrs (username: _: {
-      initialPassword = lib.mkDefault "${username}"; # Setting initial password to the username
-      isNormalUser = lib.mkDefault true;
+    users =
+      lib.mapAttrs (username: _: {
+        isNormalUser = lib.mkDefault true;
 
-      extraGroups = [
-        "wheel"
-        "networkmanager"
-        "audio"
-        "input"
-      ];
-    })
-    host.users;
+        extraGroups = [
+          "wheel"
+          "networkmanager"
+          "audio"
+          "input"
+        ];
+      })
+      host.users;
   };
+
+  # NTP
+  networking.timeServers = options.networking.timeServers.default;
 
   # Imports
   imports = [

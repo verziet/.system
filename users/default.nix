@@ -4,11 +4,9 @@
   pkgs-master,
   inputs,
   lib,
-  config,
   host,
   hostname,
   username,
-  configuration,
   ...
 }: {
   # Modules

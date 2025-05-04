@@ -17,13 +17,6 @@
 
       grub = let
         extraEntries = ''
-               menuentry 'Windows' --class windows --class os $menuentry_id_option 'osprober-efi-2275-5F7C' {
-               	insmod part_gpt
-               	insmod fat
-               	search --no-floppy --fs-uuid --set=root 2275-5F7C
-               	chainloader /efi/Microsoft/Boot/bootmgfw.efi
-               }
-
           menuentry "Reboot" --class restart {
           	reboot
           }
@@ -34,9 +27,10 @@
         '';
       in {
         enable = lib.mkForce true;
+        configurationLimit = lib.mkDefault 10;
         theme = lib.mkDefault pkgs.minimal-grub-theme;
 
-        useOSProber = lib.mkDefault false;
+        useOSProber = lib.mkDefault true;
         efiSupport = lib.mkDefault true;
         device = lib.mkDefault "nodev";
 
@@ -45,7 +39,7 @@
 
         extraInstallCommands = lib.mkDefault ''
           echo "${extraEntries}" >> /boot/grub/grub.cfg
-        ''; # TODO rename Windows entries
+        '';
       };
     };
   };

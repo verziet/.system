@@ -30,6 +30,7 @@
 
       swww
       kanata
+      kitty
 
       nodejs
       nodePackages.pnpm

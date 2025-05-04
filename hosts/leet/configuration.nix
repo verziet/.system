@@ -5,34 +5,18 @@
   inputs,
   lib,
   config,
-  options,
   host,
   hostname,
   ...
 }: {
-  imports = [
-    ../../modules/nixos/hardware/nvidia.nix
-    ../../modules/nixos/hardware/displaylink.nix
-
-    ../../modules/nixos/desktop/sddm.nix
-    ../../modules/nixos/desktop/hyprland.nix
-    ../../modules/nixos/desktop/gnome.nix
-
-    ../../modules/nixos/services/kanata.nix
-  ];
-
   programs.nix-ld.enable = true;
   programs.nix-ld.libraries = with pkgs; [
     biome
   ];
 
-  networking.timeServers = options.networking.timeServers.default;
-
   environment.sessionVariables = {
     NH_FLAKE = "/home/verz/.system/";
   };
-
-  services.hardware.bolt.enable = true;
 
   fonts.packages = with pkgs; [
     nerd-fonts.jetbrains-mono

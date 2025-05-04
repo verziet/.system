@@ -13,12 +13,11 @@
   };
 
   config = lib.mkIf config."hyprland".enableModule {
-    systemd.tmpfiles.rules = lib.concatMap (username: [
-      ''f+ /home/${username}/.config/uwsm/env - - - - export NIXOS_OZONE_WL=1\nexport QT_AUTO_SCREEN_SCALE_FACTOR=1\nexport QT_QPA_PLATFORM=wayland;xcb\nexport QT_WAYLAND_DISABLE_WINDOWDECORATION=1\nexport QT_QPA_PLATFORMTHEME=qt5ct''
-      #TODO (lib.optional (config.nvidia.enableModule) ''w+ /home/${username}/.config/uwsm/env - - - - export GBM_BACKEND=nvidia-drm\nexport __GLX_VENDOR_LIBRRY_NAME=nvidia\nexport LIBVA_DRIVER_NAME=nvidia'')
-    ]) (lib.attrNames host.users);
-
     programs.uwsm.enable = lib.mkForce true;
+    nix.settings = {
+      substituters = ["https://hyprland.cachix.org"];
+      trusted-public-keys = ["hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="];
+    };
 
     programs.hyprland = {
       enable = lib.mkForce true;

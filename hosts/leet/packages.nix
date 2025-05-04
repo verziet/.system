@@ -1,5 +1,4 @@
 {
-  self,
   pkgs,
   pkgs-stable,
   pkgs-master,

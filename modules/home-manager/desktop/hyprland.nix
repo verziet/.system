@@ -14,7 +14,6 @@
   };
 
   config = lib.mkIf config."hyprland".enableModule {
-    /**
     home.file = {
       ".config/uwsm/env" = {
         text = ''
@@ -24,13 +23,9 @@
           export QT_QPA_PLATFORM=wayland;xcb
           export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
           export QT_QPA_PLATFORMTHEME=qt5ct
-        '' + lib.optional (config.nvidia.enableModule) ''
-          j
         '';
       };
     };
-    *
-    */
 
     wayland.windowManager.hyprland = {
       enable = lib.mkForce true;
